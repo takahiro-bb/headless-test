@@ -1,0 +1,184 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+
+const response = await fetch("https://xs688150.xsrv.jp/headless/graphql", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    query: `
+      query GetLatestPosts {
+        posts(first: 3) {
+          nodes {
+            id
+            title
+            slug
+            date
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+      }
+    `,
+  }),
+});
+
+const { data } = await response.json();
+const latestPosts = data.posts.nodes;
+---
+
+<Layout title="TOP | My Headless Site">
+  {/* メインビジュアル */}
+  <section class="p-hero">
+    <div class="p-hero__inner">
+      <h1 class="p-hero__title">Creative Frontend <br>with Headless WP</h1>
+      <p class="p-hero__text">AstroとWordPressを組み合わせた、爆速で自由なWeb制作。</p>
+    </div>
+  </section>
+
+  {/* 最新記事セクション */}
+  <section class="p-top-posts">
+    <div class="p-top-posts__inner">
+      <div class="p-top-posts__head">
+        <h2 class="c-sec-title">Latest News</h2>
+        <a href="/list" class="c-btn">View All</a>
+      </div>
+
+      <div class="p-post-list">
+        {latestPosts.map((post) => (
+          <article class="p-post-card">
+            <a href={`/posts/${post.slug}`} class="p-post-card__link">
+              <div class="p-post-card__img">
+                {post.featuredImage ? (
+                  <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
+                ) : (
+                  <div class="c-no-image">No Image</div>
+                )}
+              </div>
+              <div class="p-post-card__content">
+                <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
+                <h3 class="p-post-card__title">{post.title}</h3>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style lang="scss">
+// 共通パーツ
+.c-sec-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  position: relative;
+  padding-bottom: 15px;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 4px;
+    background: #333;
+  }
+}
+
+.c-btn {
+  display: inline-block;
+  padding: 10px 30px;
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  &:hover {
+    background: #333;
+    color: #fff;
+  }
+}
+
+// ヒーローセクション
+.p-hero {
+  background: #f8f9fa;
+  padding: 120px 20px;
+  text-align: center;
+  &__title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  &__text {
+    color: #666;
+  }
+}
+
+// 最新記事セクション
+.p-top-posts {
+  padding: 80px 20px;
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+  }
+}
+
+// 記事カード（BEMで管理）
+.p-post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.p-post-card {
+  &__link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    &:hover {
+      .p-post-card__img img {
+        transform: scale(1.05);
+      }
+    }
+  }
+  &__img {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #eee;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+  }
+  &__content {
+    padding-top: 15px;
+  }
+  &__date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  &__title {
+    font-size: 1.1rem;
+    margin-top: 5px;
+    line-height: 1.5;
+    // 2行以上は省略するスタイル（お好みで）
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+</style>
