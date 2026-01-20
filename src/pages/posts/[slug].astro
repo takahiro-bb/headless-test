@@ -7,7 +7,7 @@ import Layout from '../../layouts/Layout.astro';
 
 const { slug } = Astro.params;
 
-const response = await fetch("https://xs688150.xsrv.jp/headless/graphql", {
+const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

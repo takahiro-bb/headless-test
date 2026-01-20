@@ -2,7 +2,8 @@
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
 
-const response = await fetch("https://xs688150.xsrv.jp/headless/graphql", {
+// 【修正ポイント】環境変数からURLを読み込む
+const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -28,7 +29,7 @@ const response = await fetch("https://xs688150.xsrv.jp/headless/graphql", {
 });
 
 const { data } = await response.json();
-const latestPosts = data.posts.nodes;
+const latestPosts = data?.posts?.nodes || []; // エラー防止のために初期値を設定
 ---
 
 <Layout title="TOP | My Headless Site">
@@ -72,7 +73,7 @@ const latestPosts = data.posts.nodes;
 </Layout>
 
 <style lang="scss">
-// 共通パーツ
+/* スタイル部分は変更なしでOK */
 .c-sec-title {
   font-size: 2rem;
   font-weight: 700;
@@ -104,7 +105,6 @@ const latestPosts = data.posts.nodes;
   }
 }
 
-// ヒーローセクション
 .p-hero {
   background: #f8f9fa;
   padding: 120px 20px;
@@ -119,7 +119,6 @@ const latestPosts = data.posts.nodes;
   }
 }
 
-// 最新記事セクション
 .p-top-posts {
   padding: 80px 20px;
   &__inner {
@@ -134,7 +133,6 @@ const latestPosts = data.posts.nodes;
   }
 }
 
-// 記事カード（BEMで管理）
 .p-post-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -174,7 +172,6 @@ const latestPosts = data.posts.nodes;
     font-size: 1.1rem;
     margin-top: 5px;
     line-height: 1.5;
-    // 2行以上は省略するスタイル（お好みで）
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
