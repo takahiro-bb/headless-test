@@ -1,10 +1,8 @@
-// @ts-check
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel/serverless'; // これが必要
 
-import vercel from '@astrojs/vercel';
-
-// https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  adapter: vercel(),
+  output: 'server', // これを絶対に忘れないで！
+  adapter: vercel(), // これが必要
 });
