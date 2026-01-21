@@ -1,8 +1,9 @@
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel'; // ★ここが重要！ /serverless を消す
+
+import netlify from '@astrojs/netlify';
 
 export default defineConfig({
   output: 'server',
-  adapter: vercel(),
+  adapter: netlify()
 });
