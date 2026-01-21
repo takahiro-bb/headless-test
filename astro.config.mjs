@@ -5,6 +5,6 @@ import vercel from '@astrojs/vercel/serverless'; // ここがserverlessになっ
 export default defineConfig({
   output: 'server',
   adapter: vercel({
-    webAnalytics: { enabled: true }, // 任意
+    webAnalytics: { enabled: true },
   }),
 });
