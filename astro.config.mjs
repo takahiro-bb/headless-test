@@ -1,8 +1,8 @@
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless'; // ここが serverless になっていること
+import vercel from '@astrojs/vercel/serverless';
 
 export default defineConfig({
-  output: 'server', // 必ず 'server' に！
+  output: 'server',
   adapter: vercel(),
 });
