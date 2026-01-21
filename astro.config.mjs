@@ -1,10 +1,8 @@
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless'; // ここがserverlessになっているか確認
+import vercel from '@astrojs/vercel/serverless'; // ここが serverless になっていること
 
 export default defineConfig({
-  output: 'server',
-  adapter: vercel({
-    webAnalytics: { enabled: true },
-  }),
+  output: 'server', // 必ず 'server' に！
+  adapter: vercel(),
 });
