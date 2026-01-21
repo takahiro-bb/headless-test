@@ -1,0 +1,69 @@
+---
+// src/components/Breadcrumbs.astro
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="c-breadcrumbs">
+  <div class="l-container">
+    <ol class="c-breadcrumbs__list">
+      <li class="c-breadcrumbs__item">
+        <a href="/">HOME</a>
+      </li>
+      {items.map((item, index) => (
+        <li class="c-breadcrumbs__item">
+          {index === items.length - 1 ? (
+            <span aria-current="page">{item.name}</span>
+          ) : (
+            <a href={item.href}>{item.name}</a>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+</nav>
+
+<style lang="scss">
+.c-breadcrumbs {
+  padding: 15px 0;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    color: #888;
+
+    &::after {
+      content: "/"; // 区切り文字
+      margin: 0 10px;
+      color: #ccc;
+    }
+
+    &:last-child::after {
+      display: none;
+    }
+
+    a {
+      color: #666;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    span {
+      font-weight: bold;
+      color: #333;
+    }
+  }
+}
+</style>

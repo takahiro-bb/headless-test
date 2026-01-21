@@ -1,6 +1,7 @@
 ---
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 // 環境変数からURLを読み込む
 const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
@@ -35,11 +36,16 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
 });
 
 const { data } = await response.json();
-// data.posts.nodes が存在するかチェック
 const latestPosts = data?.posts?.nodes || [];
+
+// トップページはパンくずの items を空にする（Breadcrumbs.astro側でHOMEは自動で出るため）
+const breadcrumbItems = [];
 ---
 
 <Layout title="TOP | My Headless Site">
+  {/* パンくずリスト（HOMEのみ表示される） */}
+  <Breadcrumbs items={breadcrumbItems} />
+
   {/* メインビジュアル */}
   <section class="p-hero">
     <div class="p-hero__inner">
@@ -50,7 +56,7 @@ const latestPosts = data?.posts?.nodes || [];
 
   {/* 最新記事セクション */}
   <section class="p-top-posts">
-    <div class="p-top-posts__inner">
+    <div class="l-container">
       <div class="p-top-posts__head">
         <h2 class="c-sec-title">Latest News</h2>
         <a href="/posts/list" class="c-btn">View All</a>
@@ -81,7 +87,7 @@ const latestPosts = data?.posts?.nodes || [];
             </article>
           ))
         ) : (
-          <p>表示できる記事がありません。WordPress側で記事が「公開」されているか確認してください。</p>
+          <p>記事が見つかりませんでした。</p>
         )}
       </div>
     </div>
@@ -89,6 +95,7 @@ const latestPosts = data?.posts?.nodes || [];
 </Layout>
 
 <style lang="scss">
+// ページ固有のスタイル
 .c-sec-title {
   font-size: 2rem;
   font-weight: 700;
@@ -103,20 +110,6 @@ const latestPosts = data?.posts?.nodes || [];
     width: 60px;
     height: 4px;
     background: #333;
-  }
-}
-
-.c-btn {
-  display: inline-block;
-  padding: 10px 30px;
-  border: 1px solid #333;
-  text-decoration: none;
-  color: #333;
-  font-size: 0.9rem;
-  transition: all 0.3s;
-  &:hover {
-    background: #333;
-    color: #fff;
   }
 }
 
@@ -135,11 +128,7 @@ const latestPosts = data?.posts?.nodes || [];
 }
 
 .p-top-posts {
-  padding: 80px 20px;
-  &__inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+  padding: 80px 0;
   &__head {
     display: flex;
     justify-content: space-between;
@@ -192,31 +181,8 @@ const latestPosts = data?.posts?.nodes || [];
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-}
-
-.c-category-label {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #333;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 4px;
-  margin-right: 5px;
-}
-
-.p-post-card__categories {
-  margin-bottom: 8px;
-}
-
-.c-no-image {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ddd;
-  color: #888;
-  font-size: 0.8rem;
+  &__categories {
+    margin: 8px 0;
+  }
 }
 </style>

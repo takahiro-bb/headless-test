@@ -1,0 +1,66 @@
+/* src/styles/global.scss */
+
+// 基本設定
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+// 共通コンテナ
+.l-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// 共通バッジ（c-category-label）
+.c-category-label {
+  display: inline-block;
+  padding: 2px 10px;
+  background: #333;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #555;
+  }
+}
+
+// 共通ボタン（c-btn）
+.c-btn {
+  display: inline-block;
+  padding: 10px 30px;
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background: #333;
+    color: #fff;
+  }
+}
+
+// 画像がない時のダミー
+.c-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  color: #888;
+  font-size: 0.8rem;
+}
