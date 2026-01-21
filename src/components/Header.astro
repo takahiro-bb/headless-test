@@ -10,15 +10,6 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
           nodes {
             label
             uri
-            connectedObject {
-              __typename
-              ... on Post {
-                slug
-              }
-              ... on Page {
-                slug
-              }
-            }
           }
         }
       }
@@ -44,10 +35,16 @@ const menuItems = json.data?.menuItems?.nodes || [];
     {/* ナビゲーション */}
     <nav class="l-header__nav" id="js-nav">
       <ul class="l-header__list">
+        {/* 1. 先頭に静的リンクを入れたい場合はここに記述 */}
+        <li><a href="/">HOME</a></li>
+
+        {/* 2. WP側のメニューを表示 */}
         {menuItems.map((item) => (
-          /* 【修正】item.href ではなく item.uri を使う */
           <li><a href={item.uri}>{item.label}</a></li>
         ))}
+
+        {/* 3. 末尾に静的リンクを入れたい場合はここに記述 */}
+        <li><a href="/contact">CONTACT</a></li>
       </ul>
     </nav>
   </div>
@@ -58,14 +55,16 @@ const menuItems = json.data?.menuItems?.nodes || [];
   const nav = document.getElementById('js-nav');
 
   if (hamburger && nav) {
-    hamburger.addEventListener('click', () => {
+    const toggleMenu = () => {
       const isOpen = hamburger.classList.toggle('is-open');
       nav.classList.toggle('is-open');
       hamburger.setAttribute('aria-expanded', String(isOpen));
       document.body.style.overflow = isOpen ? 'hidden' : 'visible';
-    });
+    };
 
-    // リンクをクリックした時にメニューを閉じる処理（スマホ用）
+    hamburger.addEventListener('click', toggleMenu);
+
+    // リンクをクリックした時にメニューを閉じる処理
     const navLinks = nav.querySelectorAll('a');
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
@@ -91,13 +90,12 @@ const menuItems = json.data?.menuItems?.nodes || [];
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* ボタンとロゴが被らないように最小の高さを確保 */
     min-height: 44px;
   }
 
   &__logo {
     position: relative;
-    z-index: 110; 
+    z-index: 110;
     a {
       font-size: 1.2rem;
       font-weight: 800;
@@ -113,7 +111,7 @@ const menuItems = json.data?.menuItems?.nodes || [];
       right: -100%;
       width: 100%;
       height: 100vh;
-      background: #fff; // 透過させすぎると文字が見にくいので白背景に
+      background: #fff;
       z-index: 100;
       transition: right 0.4s ease;
       display: flex;
@@ -137,7 +135,6 @@ const menuItems = json.data?.menuItems?.nodes || [];
       flex-direction: column;
       text-align: center;
       gap: 30px;
-      /* メニュー内のリンクを押しやすくする */
       width: 100%;
     }
 
@@ -146,7 +143,12 @@ const menuItems = json.data?.menuItems?.nodes || [];
       color: #333;
       font-size: 0.9rem;
       font-weight: 600;
-      display: block; // クリック範囲を広げる
+      display: block;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #888;
+      }
       
       @media (max-width: 768px) {
         font-size: 1.5rem;

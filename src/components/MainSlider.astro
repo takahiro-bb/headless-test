@@ -1,0 +1,124 @@
+---
+// src/components/MainSlider.astro
+const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    query: `
+      query GetSliderPosts {
+        posts(where: {
+          categoryName: "slider",
+          orderby: { field: DATE, order: ASC }
+        }, first: 5) {
+          nodes {
+            id
+            title
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+      }
+    `,
+  }),
+});
+
+const json = await response.json();
+const sliderPosts = json.data?.posts?.nodes || [];
+---
+
+{sliderPosts.length > 0 && (
+  <section class="splide" id="js-main-slider" aria-label="メインスライダー">
+    <div class="splide__track">
+      <ul class="splide__list">
+        {sliderPosts.map((post) => (
+          post.featuredImage && (
+            <li class="splide__slide">
+              <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
+              <div class="p-slider-caption">{post.title}</div>
+            </li>
+          )
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<script>
+  import Splide from '@splidejs/splide';
+  import '@splidejs/splide/css';
+
+  const startSplide = () => {
+    const target = document.getElementById('js-main-slider');
+    
+    if (target && !target.classList.contains('is-initialized')) {
+      const splide = new Splide(target, {
+        type: 'fade',
+        rewind: true,
+        autoplay: true,
+        interval: 5000,
+        pauseOnHover: false,
+        arrows: true,
+        pagination: true,
+        speed: 1500,
+      });
+
+      splide.mount();
+      
+      target.classList.add('is-initialized');
+      target.style.visibility = 'visible';
+    }
+  };
+
+  // ページ読み込み完了時とAstroのページ遷移時に実行
+  window.addEventListener('load', startSplide);
+  document.addEventListener('astro:page-load', startSplide);
+</script>
+
+<style lang="scss">
+.splide {
+  visibility: hidden; // 初期化まで隠す
+  min-height: 300px;
+  background: #f0f0f0;
+
+  &.is-initialized {
+    visibility: visible !important;
+  }
+
+  &__slide {
+    height: 600px;
+    position: relative;
+    
+    @media (max-width: 768px) {
+      height: 400px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.p-slider-caption {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 15px 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.9rem;
+  }
+}
+</style>

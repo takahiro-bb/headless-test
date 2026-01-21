@@ -2,15 +2,15 @@
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import MainSlider from '../components/MainSlider.astro';
 
-// 環境変数からURLを読み込む
 const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     query: `
       query GetLatestPosts {
-        posts(first: 3) {
+        posts(first: 6, where: { categoryNotIn: ["5"] }) {
           nodes {
             id
             title
@@ -37,24 +37,12 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
 
 const { data } = await response.json();
 const latestPosts = data?.posts?.nodes || [];
-
-// トップページはパンくずの items を空にする（Breadcrumbs.astro側でHOMEは自動で出るため）
-const breadcrumbItems = [];
 ---
 
 <Layout title="TOP | My Headless Site">
-  {/* パンくずリスト（HOMEのみ表示される） */}
-  <Breadcrumbs items={breadcrumbItems} />
+  <MainSlider />
+  <Breadcrumbs items={[]} />
 
-  {/* メインビジュアル */}
-  <section class="p-hero">
-    <div class="p-hero__inner">
-      <h1 class="p-hero__title">Creative Frontend <br>with Headless WP</h1>
-      <p class="p-hero__text">AstroとWordPressを組み合わせた、爆速で自由なWeb制作。</p>
-    </div>
-  </section>
-
-  {/* 最新記事セクション */}
   <section class="p-top-posts">
     <div class="l-container">
       <div class="p-top-posts__head">
@@ -63,45 +51,40 @@ const breadcrumbItems = [];
       </div>
 
       <div class="p-post-list">
-        {latestPosts.length > 0 ? (
-          latestPosts.map((post) => (
-            <article class="p-post-card">
-              <a href={`/posts/${post.slug}`} class="p-post-card__link">
-                <div class="p-post-card__img">
-                  {post.featuredImage ? (
-                    <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
-                  ) : (
-                    <div class="c-no-image">No Image</div>
-                  )}
+        {latestPosts.map((post) => (
+          <article class="p-post-card">
+            <a href={`/posts/${post.slug}`} class="p-post-card__link">
+              <div class="p-post-card__img">
+                {post.featuredImage ? (
+                  <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
+                ) : (
+                  <div class="c-no-image">No Image</div>
+                )}
+              </div>
+              <div class="p-post-card__content">
+                <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
+                <div class="p-post-card__categories">
+                  {post.categories.nodes.map((cat) => (
+                    <span class="c-category-label">{cat.name}</span>
+                  ))}
                 </div>
-                <div class="p-post-card__content">
-                  <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
-                  <div class="p-post-card__categories">
-                    {post.categories.nodes.map((cat) => (
-                      <span class="c-category-label">{cat.name}</span>
-                    ))}
-                  </div>
-                  <h3 class="p-post-card__title">{post.title}</h3>
-                </div>
-              </a>
-            </article>
-          ))
-        ) : (
-          <p>記事が見つかりませんでした。</p>
-        )}
+                <h3 class="p-post-card__title">{post.title}</h3>
+              </div>
+            </a>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 </Layout>
 
 <style lang="scss">
-// ページ固有のスタイル
 .c-sec-title {
   font-size: 2rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
   position: relative;
   padding-bottom: 15px;
+
   &::after {
     content: "";
     position: absolute;
@@ -113,22 +96,9 @@ const breadcrumbItems = [];
   }
 }
 
-.p-hero {
-  background: #f8f9fa;
-  padding: 120px 20px;
-  text-align: center;
-  &__title {
-    font-size: clamp(2rem, 5vw, 4rem);
-    line-height: 1.2;
-    margin-bottom: 20px;
-  }
-  &__text {
-    color: #666;
-  }
-}
-
 .p-top-posts {
   padding: 80px 0;
+
   &__head {
     display: flex;
     justify-content: space-between;
@@ -148,16 +118,19 @@ const breadcrumbItems = [];
     text-decoration: none;
     color: inherit;
     display: block;
+
     &:hover {
       .p-post-card__img img {
         transform: scale(1.05);
       }
     }
   }
+
   &__img {
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: #eee;
+
     img {
       width: 100%;
       height: 100%;
@@ -165,22 +138,22 @@ const breadcrumbItems = [];
       transition: transform 0.5s ease;
     }
   }
+
   &__content {
     padding-top: 15px;
   }
+
   &__date {
     font-size: 0.85rem;
     color: #888;
   }
+
   &__title {
     font-size: 1.1rem;
     margin-top: 5px;
     line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
+
   &__categories {
     margin: 8px 0;
   }
