@@ -2,7 +2,7 @@
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
 
-// 【修正ポイント】環境変数からURLを読み込む
+// 環境変数からURLを読み込む
 const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -35,7 +35,8 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
 });
 
 const { data } = await response.json();
-const latestPosts = data?.posts?.nodes || []; // エラー防止のために初期値を設定
+// data.posts.nodes が存在するかチェック
+const latestPosts = data?.posts?.nodes || [];
 ---
 
 <Layout title="TOP | My Headless Site">
@@ -52,40 +53,42 @@ const latestPosts = data?.posts?.nodes || []; // エラー防止のために初�
     <div class="p-top-posts__inner">
       <div class="p-top-posts__head">
         <h2 class="c-sec-title">Latest News</h2>
-        <a href="/list" class="c-btn">View All</a>
+        <a href="/posts/list" class="c-btn">View All</a>
       </div>
 
       <div class="p-post-list">
-        {latestPosts.map((post) => (
-          <article class="p-post-card">
-            <a href={`/posts/${post.slug}`} class="p-post-card__link">
-              <div class="p-post-card__img">
-                {post.featuredImage ? (
-                  <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
-                ) : (
-                  <div class="c-no-image">No Image</div>
-                )}
-              </div>
-              <div class="p-post-card__content">
-                <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
-                {/* カテゴリーバッジの表示 */}
-                <div class="p-post-card__categories">
-                  {post.categories.nodes.map((cat) => (
-                    <span class="c-category-label">{cat.name}</span>
-                  ))}
+        {latestPosts.length > 0 ? (
+          latestPosts.map((post) => (
+            <article class="p-post-card">
+              <a href={`/posts/${post.slug}`} class="p-post-card__link">
+                <div class="p-post-card__img">
+                  {post.featuredImage ? (
+                    <img src={post.featuredImage.node.sourceUrl} alt={post.featuredImage.node.altText || post.title} />
+                  ) : (
+                    <div class="c-no-image">No Image</div>
+                  )}
                 </div>
-                <h3 class="p-post-card__title">{post.title}</h3>
-              </div>
-            </a>
-          </article>
-        ))}
+                <div class="p-post-card__content">
+                  <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
+                  <div class="p-post-card__categories">
+                    {post.categories.nodes.map((cat) => (
+                      <span class="c-category-label">{cat.name}</span>
+                    ))}
+                  </div>
+                  <h3 class="p-post-card__title">{post.title}</h3>
+                </div>
+              </a>
+            </article>
+          ))
+        ) : (
+          <p>表示できる記事がありません。WordPress側で記事が「公開」されているか確認してください。</p>
+        )}
       </div>
     </div>
   </section>
 </Layout>
 
 <style lang="scss">
-/* スタイル部分は変更なしでOK */
 .c-sec-title {
   font-size: 2rem;
   font-weight: 700;
@@ -194,7 +197,7 @@ const latestPosts = data?.posts?.nodes || []; // エラー防止のために初�
 .c-category-label {
   display: inline-block;
   padding: 2px 8px;
-  background: #333; // 黒背景に白文字でモダンに
+  background: #333;
   color: #fff;
   font-size: 0.75rem;
   font-weight: 500;
@@ -204,5 +207,16 @@ const latestPosts = data?.posts?.nodes || []; // エラー防止のために初�
 
 .p-post-card__categories {
   margin-bottom: 8px;
+}
+
+.c-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  color: #888;
+  font-size: 0.8rem;
 }
 </style>

@@ -48,9 +48,12 @@ if (!post) {
     <article class="p-entry">
       <header class="p-entry__header">
         <div class="p-entry__meta">
+          {/* カテゴリーバッジをリンクにする */}
           <div class="p-post-card__categories">
             {post.categories.nodes.map((cat) => (
-              <span class="c-category-label">{cat.name}</span>
+              <a href={`/category/${cat.slug}`} class="c-category-label">
+                {cat.name}
+              </a>
             ))}
           </div>
           <time class="p-entry__date" datetime={post.date}>
