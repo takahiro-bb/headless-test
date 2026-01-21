@@ -1,0 +1,29 @@
+---
+// src/components/Footer.astro
+---
+
+<footer class="l-footer">
+  <div class="l-container">
+    <div class="l-footer__inner">
+      <p class="l-footer__copy">&copy; 2026 My Headless Site.</p>
+    </div>
+  </div>
+</footer>
+
+<style lang="scss">
+.l-footer {
+  background: #333;
+  color: #fff;
+  padding: 40px 0;
+  margin-top: auto; // コンテンツが少なくても最下部に固定するため
+
+  &__inner {
+    text-align: center;
+  }
+
+  &__copy {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+}
+</style>
