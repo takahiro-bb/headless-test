@@ -1,6 +1,6 @@
 ---
 // src/components/Header.astro
-const response = await fetch("https://xs688150.xsrv.jp/headless/graphql", {
+const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -31,57 +31,181 @@ const menuItems = json.data?.menuItems?.nodes || [];
 ---
 
 <header class="l-header">
-  <div class="l-header__inner">
-    <a href="/" class="l-header__logo">My Headless Site</a>
+  <div class="l-container l-header__inner">
+    <div class="l-header__logo">
+      <a href="/">MY HEADLESS SITE</a>
+    </div>
 
-    <nav>
-      <ul class="p-gnav">
-        {menuItems.map((item) => {
-          const type = item.connectedObject?.__typename;
-          const slug = item.connectedObject?.slug;
-          
-          let href = "";
-          if (type === 'Post') {
-            href = `/posts/${slug}`;
-          } else if (type === 'Page') {
-            href = `/${slug}`;
-          } else {
-            // カスタムリンク（listなど）の場合は、WordPressで設定したuriをそのまま使う
-            // uriが "/list/" のようになるので、適宜ドメインを除去する処理を入れると安全
-            href = item.uri.replace('https://xs688150.xsrv.jp/headless', '');
-          }
+    {/* ハンバーガーボタン */}
+    <button type="button" class="c-hamburger" id="js-hamburger" aria-controls="js-nav" aria-expanded="false" aria-label="メニューを開く">
+      <span class="c-hamburger__line"></span>
+    </button>
 
-          return (
-            <li class="p-gnav__item">
-              <a href={href} class="p-gnav__link">{item.label}</a>
-            </li>
-          );
-        })}
+    {/* ナビゲーション */}
+    <nav class="l-header__nav" id="js-nav">
+      <ul class="l-header__list">
+        {menuItems.map((item) => (
+          /* 【修正】item.href ではなく item.uri を使う */
+          <li><a href={item.uri}>{item.label}</a></li>
+        ))}
       </ul>
     </nav>
   </div>
 </header>
 
+<script>
+  const hamburger = document.getElementById('js-hamburger');
+  const nav = document.getElementById('js-nav');
+
+  if (hamburger && nav) {
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.classList.toggle('is-open');
+      nav.classList.toggle('is-open');
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      document.body.style.overflow = isOpen ? 'hidden' : 'visible';
+    });
+
+    // リンクをクリックした時にメニューを閉じる処理（スマホ用）
+    const navLinks = nav.querySelectorAll('a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('is-open');
+        nav.classList.remove('is-open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = 'visible';
+      });
+    });
+  }
+</script>
+
 <style lang="scss">
 .l-header {
+  background: #fff;
   border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
   &__inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
+    /* ボタンとロゴが被らないように最小の高さを確保 */
+    min-height: 44px;
+  }
+
+  &__logo {
+    position: relative;
+    z-index: 110; 
+    a {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #333;
+      text-decoration: none;
+    }
+  }
+
+  &__nav {
+    @media (max-width: 768px) {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      height: 100vh;
+      background: #fff; // 透過させすぎると文字が見にくいので白背景に
+      z-index: 100;
+      transition: right 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.is-open {
+        right: 0;
+      }
+    }
+  }
+
+  &__list {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 30px;
+      /* メニュー内のリンクを押しやすくする */
+      width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: #333;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block; // クリック範囲を広げる
+      
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+        padding: 10px;
+      }
+    }
   }
 }
-.p-gnav {
-  display: flex;
-  gap: 20px;
-  list-style: none;
-  &__link {
-    text-decoration: none;
-    color: #333;
-    &:hover { color: #0073aa; }
+
+.c-hamburger {
+  display: none;
+  position: relative;
+  z-index: 110;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+
+  &__line {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #333;
+    margin: 0 auto;
+    position: relative;
+    transition: background 0.3s;
+
+    &::before, &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #333;
+      left: 0;
+      transition: transform 0.3s, top 0.3s;
+    }
+
+    &::before { top: -8px; }
+    &::after { top: 8px; }
+  }
+
+  &.is-open {
+    .c-hamburger__line {
+      background: transparent;
+      &::before {
+        top: 0;
+        transform: rotate(45deg);
+      }
+      &::after {
+        top: 0;
+        transform: rotate(-45deg);
+      }
+    }
   }
 }
 </style>
