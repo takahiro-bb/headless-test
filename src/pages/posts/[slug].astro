@@ -17,6 +17,12 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
           title
           content
           date
+          categories {
+        nodes {
+          name
+          slug
+        }
+      }
           featuredImage {
             node {
               sourceUrl
@@ -42,6 +48,11 @@ if (!post) {
     <article class="p-entry">
       <header class="p-entry__header">
         <div class="p-entry__meta">
+          <div class="p-post-card__categories">
+            {post.categories.nodes.map((cat) => (
+              <span class="c-category-label">{cat.name}</span>
+            ))}
+          </div>
           <time class="p-entry__date" datetime={post.date}>
             {new Date(post.date).toLocaleDateString('ja-JP')}
           </time>
@@ -72,6 +83,11 @@ if (!post) {
   padding: 60px 20px;
 
   &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
     margin-bottom: 15px;
   }
 
@@ -143,5 +159,20 @@ if (!post) {
   &:hover {
     opacity: 0.8;
   }
+}
+
+.c-category-label {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #333; // 黒背景に白文字でモダンに
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.p-post-card__categories {
+  margin-bottom: 8px;
 }
 </style>

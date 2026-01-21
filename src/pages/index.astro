@@ -15,6 +15,12 @@ const response = await fetch(import.meta.env.WORDPRESS_API_URL, {
             title
             slug
             date
+            categories {
+              nodes {
+                name
+                slug
+              }
+            }
             featuredImage {
               node {
                 sourceUrl
@@ -62,6 +68,12 @@ const latestPosts = data?.posts?.nodes || []; // エラー防止のために初�
               </div>
               <div class="p-post-card__content">
                 <time class="p-post-card__date">{new Date(post.date).toLocaleDateString()}</time>
+                {/* カテゴリーバッジの表示 */}
+                <div class="p-post-card__categories">
+                  {post.categories.nodes.map((cat) => (
+                    <span class="c-category-label">{cat.name}</span>
+                  ))}
+                </div>
                 <h3 class="p-post-card__title">{post.title}</h3>
               </div>
             </a>
@@ -177,5 +189,20 @@ const latestPosts = data?.posts?.nodes || []; // エラー防止のために初�
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+.c-category-label {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #333; // 黒背景に白文字でモダンに
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.p-post-card__categories {
+  margin-bottom: 8px;
 }
 </style>
