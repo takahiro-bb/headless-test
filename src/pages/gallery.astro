@@ -1,0 +1,32 @@
+---
+// src/pages/gallery.astro
+import Layout from '../layouts/Layout.astro';
+import GalleryList from '../components/GalleryList.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+---
+
+<Layout title="ギャラリー | MY HEADLESS SITE">
+  <Breadcrumbs items={[{ name: 'ギャラリー', href: '/gallery' }]} />
+  
+  <main>
+    <section class="p-page-head">
+      <div class="l-container">
+        <h1 class="c-title">Gallery</h1>
+      </div>
+    </section>
+
+    <GalleryList />
+  </main>
+</Layout>
+
+<style lang="scss">
+  .p-page-head {
+    background: #f8f9fa;
+    padding: 60px 0;
+    text-align: center;
+  }
+  .c-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+  }
+</style>
